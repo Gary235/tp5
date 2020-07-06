@@ -33,19 +33,24 @@ Boolean TodosPermisos=false;
         img=findViewById(R.id.imagen);
         foto=findViewById(R.id.Foto);
         gal=findViewById(R.id.Galeria);
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.INTERNET
+            }, 1);
         }
     }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         for (int i = 0; i < permissions.length; i++) {
-            if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
-                TodosPermisos = false;
-            } else {
-                TodosPermisos = true;
-            }
+
+            if (grantResults[i] == PackageManager.PERMISSION_DENIED) { TodosPermisos = false; }
+            else { TodosPermisos = true; }
+
         }
         if(TodosPermisos==false)
         {
@@ -69,12 +74,11 @@ Boolean TodosPermisos=false;
         else{
             Intent llamarASacarFoto;
             llamarASacarFoto=new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            startActivityForResult(llamarASacarFoto,1);
+            startActivityForResult(llamarASacarFoto,2);
         }
     }
     @Override
-    protected void onActivityResult(int requestCode, int resultCode,
-                                    Intent imageReturnedIntent) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
         super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
         Uri selectedImageUri = null;
         Uri selectedImage;
@@ -85,27 +89,31 @@ Boolean TodosPermisos=false;
                 if (resultCode == Activity.RESULT_OK) {
                     selectedImage = imageReturnedIntent.getData();
                     String selectedPath=selectedImage.getPath();
-                    if (requestCode == 1) {
 
+                    if (requestCode == 1) {
                         if (selectedPath != null) {
                             InputStream imageStream = null;
                             try {
-                                imageStream = getApplicationContext().getContentResolver().openInputStream(
-                                        selectedImage);
-                            } catch (FileNotFoundException e) {
-                                e.printStackTrace();
-                            }
+                                imageStream = getApplicationContext().getContentResolver().openInputStream(selectedImage);
 
+                            } catch (FileNotFoundException e) { e.printStackTrace(); }
                             // Transformamos la URI de la imagen a inputStream y este a un Bitmap
                             Bitmap bmp = BitmapFactory.decodeStream(imageStream);
 
                             // Ponemos nuestro bitmap en un ImageView que tengamos en la vista
-
                             img.setImageBitmap(bmp);
-
                         }
                     }
                 }
+                break;
+            case 2:
+                if (resultCode == Activity.RESULT_OK) {
+                    Bitmap fotoRecibida = (Bitmap) imageReturnedIntent.getExtras().get("data");
+                    img.setImageBitmap(fotoRecibida);
+                }
+
+
+
                 break;
         }
     }
