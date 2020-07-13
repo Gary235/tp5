@@ -37,6 +37,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -46,30 +47,27 @@ public class MainActivity extends AppCompatActivity {
     Fragment frag;
 
     ImageView img;
-    Button foto,gal;
+    Button foto, gal;
     Boolean TodosPermisos = false;
     FaceServiceRestClient servicioProcesamientoImagenes;
     SharedPreferences preferencias;
     Bitmap bmp;
     ProgressDialog dialogo;
 
+    public static ArrayList<Integer> arrProm = new ArrayList<>(), arrCant = new ArrayList<>(), arrMakeUp = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        img=findViewById(R.id.imagen);
-        foto=findViewById(R.id.Foto);
-        gal=findViewById(R.id.Galeria);
+        img = findViewById(R.id.imagen);
+        foto = findViewById(R.id.Foto);
+        gal = findViewById(R.id.Galeria);
         dialogo = new ProgressDialog(this);
 
         adminFragment = getFragmentManager();
         holder = findViewById(R.id.holder);
-        frag = new FragResultados();
-        transaccionFragment=adminFragment.beginTransaction();
-        transaccionFragment.replace(R.id.holder, frag);
-        transaccionFragment.addToBackStack(null);
-        transaccionFragment.commit();
         holder.setVisibility(View.GONE);
 
         String apiEndPoint = "https://mirecursodeface.cognitiveservices.azure.com/face/v1.0/";
@@ -78,9 +76,9 @@ public class MainActivity extends AppCompatActivity {
         preferencias = getSharedPreferences("Gary", Context.MODE_PRIVATE);
 
         try {
-             servicioProcesamientoImagenes = new FaceServiceRestClient(apiEndPoint,subscriptionKey);
+            servicioProcesamientoImagenes = new FaceServiceRestClient(apiEndPoint, subscriptionKey);
             Log.d("Servicio", "Todo bien ");
-        }catch (Exception error){
+        } catch (Exception error) {
 
             Log.d("Servicio", error.getMessage());
         }
@@ -95,39 +93,41 @@ public class MainActivity extends AppCompatActivity {
             }, 1);
         }
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         for (int i = 0; i < permissions.length; i++) {
 
-            if (grantResults[i] == PackageManager.PERMISSION_DENIED) { TodosPermisos = false; }
-            else { TodosPermisos = true; }
+            if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
+                TodosPermisos = false;
+            } else {
+                TodosPermisos = true;
+            }
 
         }
-        if(!TodosPermisos)
-        {
+        if (!TodosPermisos) {
             foto.setEnabled(true);
             gal.setEnabled(true);
         }
     }
 
-    public void  OnClick (View vista)
-    {
+    public void OnClick(View vista) {
         Button botonApretado;
-        botonApretado= (Button) vista;
-        if(gal.getId()== botonApretado.getId()){
+        botonApretado = (Button) vista;
+        if (gal.getId() == botonApretado.getId()) {
             Intent intent = new Intent();
             intent.setType("image/*");
             intent.setAction(Intent.ACTION_GET_CONTENT);
             startActivityForResult(Intent.createChooser(intent, "Seleccione una imagen"), 1);
 
-        }
-        else{
+        } else {
             Intent llamarASacarFoto;
-            llamarASacarFoto=new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            startActivityForResult(llamarASacarFoto,2);
+            llamarASacarFoto = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            startActivityForResult(llamarASacarFoto, 2);
         }
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
         super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
@@ -140,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
             case 1:
                 if (resultCode == Activity.RESULT_OK) {
                     selectedImage = imageReturnedIntent.getData();
-                    String selectedPath=selectedImage.getPath();
+                    String selectedPath = selectedImage.getPath();
 
                     if (requestCode == 1) {
                         if (selectedPath != null) {
@@ -148,10 +148,12 @@ public class MainActivity extends AppCompatActivity {
                             try {
                                 imageStream = getApplicationContext().getContentResolver().openInputStream(selectedImage);
 
-                            } catch (FileNotFoundException e) { e.printStackTrace(); }
+                            } catch (FileNotFoundException e) {
+                                e.printStackTrace();
+                            }
                             // Transformamos la URI de la imagen a inputStream y este a un Bitmap
                             bmp = BitmapFactory.decodeStream(imageStream);
-                            Log.d("Servicio","Imagen: " + bmp );
+                            Log.d("Servicio", "Imagen: " + bmp);
                             // Ponemos nuestro bitmap en un ImageView que tengamos en la vista
                             img.setImageBitmap(bmp);
                         }
@@ -162,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
                 if (resultCode == Activity.RESULT_OK) {
                     bmp = (Bitmap) imageReturnedIntent.getExtras().get("data");
                     img.setImageBitmap(bmp);
-                    Log.d("Servicio","Imagen: " + bmp );
+                    Log.d("Servicio", "Imagen: " + bmp);
                 }
                 break;
         }
@@ -170,15 +172,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
-
-    public void procesarImagenObtenida(final Bitmap imagenAProcesar){
+    public void procesarImagenObtenida(final Bitmap imagenAProcesar) {
 
         ByteArrayOutputStream streamSalida = new ByteArrayOutputStream();
-        imagenAProcesar.compress(Bitmap.CompressFormat.JPEG,100,streamSalida);
+        imagenAProcesar.compress(Bitmap.CompressFormat.JPEG, 100, streamSalida);
         ByteArrayInputStream streamEntrada = new ByteArrayInputStream(streamSalida.toByteArray());
 
-        class procesarImagen extends AsyncTask<InputStream,String, Face[]>{
+        class procesarImagen extends AsyncTask<InputStream, String, Face[]> {
 
             @Override
             protected void onPreExecute() {
@@ -192,17 +192,25 @@ public class MainActivity extends AppCompatActivity {
 
                 Face[] resultado = null;
 
-                if (inputStreams[0]!=null) {
+                if (inputStreams[0] != null) {
 
                     try {
                         Log.d("Servicio", "Entro al try");
                         FaceServiceClient.FaceAttributeType[] atributos;
                         atributos = new FaceServiceClient.FaceAttributeType[]{
                                 FaceServiceClient.FaceAttributeType.Age,
-                                FaceServiceClient.FaceAttributeType.Glasses,
+                                FaceServiceClient.FaceAttributeType.Gender,
+                                FaceServiceClient.FaceAttributeType.Emotion,
+                                FaceServiceClient.FaceAttributeType.Hair,
+                                FaceServiceClient.FaceAttributeType.Accessories,
                                 FaceServiceClient.FaceAttributeType.Smile,
                                 FaceServiceClient.FaceAttributeType.FacialHair,
-                                FaceServiceClient.FaceAttributeType.Gender
+                                FaceServiceClient.FaceAttributeType.Exposure,
+                                FaceServiceClient.FaceAttributeType.Blur,
+                                FaceServiceClient.FaceAttributeType.Glasses,
+                                FaceServiceClient.FaceAttributeType.Makeup,
+                                FaceServiceClient.FaceAttributeType.Occlusion,
+                                FaceServiceClient.FaceAttributeType.Noise
                         };
                         Log.d("Servicio", "Sale de atributos, atributos" + atributos);
 
@@ -212,8 +220,7 @@ public class MainActivity extends AppCompatActivity {
                     } catch (Exception error) {
                         Log.d("Servicio", "Error: " + error.getMessage());
                     }
-                }
-                else {
+                } else {
                     Log.d("Servicio", "Input Stream es null");
                 }
                 return resultado;
@@ -229,14 +236,22 @@ public class MainActivity extends AppCompatActivity {
             protected void onPostExecute(Face[] faces) {
                 super.onPostExecute(faces);
                 dialogo.dismiss();
-                if(faces == null) { img.setImageResource(android.R.drawable.ic_dialog_alert); }
-                else {
-                    if(faces.length > 0)
-                    {
-                        //procesarResultadosdeCara(faces);
+                if (faces == null) {
+                    img.setImageResource(android.R.drawable.ic_dialog_alert);
+                } else {
+                    if (faces.length > 0) {
+
+                        procesarCalvosFelices(faces);
+                       // procesarAccesorios(faces);
+                       // procesarMakeUpFeliz(faces);
+
+                        frag = new FragResultados();
+                        transaccionFragment = adminFragment.beginTransaction();
+                        transaccionFragment.replace(R.id.holder, frag);
+                        transaccionFragment.addToBackStack(null);
+                        transaccionFragment.commit();
                         holder.setVisibility(View.VISIBLE);
-                    }
-                    else {
+                    } else {
                         //No se detecta ninguna cara
                     }
                 }
@@ -248,41 +263,67 @@ public class MainActivity extends AppCompatActivity {
         miTarea.execute(streamEntrada);
     }
 
-    public void procesarResultadosdeCara(Face[] faces){
-        int cantVarones, cantMujeres;
-        cantVarones = preferencias.getInt("cantVarones", 0);
-        cantMujeres = preferencias.getInt("cantMujeres", 0);
+    public  void procesarCalvosFelices(Face[] faces) {
+        int cantCalvosFelices = 0, cantNoCalvosFelices = 0;
 
-        String mensaje = "";
-        for (int i = 0; i < faces.length; i++)
-        {
-            mensaje += "Edad: " + faces[i].faceAttributes.age;
-            mensaje += " - Sonrisa: " + faces[i].faceAttributes.smile;
-            mensaje += " - Barba: " + faces[i].faceAttributes.facialHair.beard;
-            mensaje += " - Genero: " + faces[i].faceAttributes.gender;
-            mensaje += " - Anteojos: " + faces[i].faceAttributes.glasses;
+        //cantCalvosFelices = preferencias.getInt("cantCalvosFelices", 0);
+        //cantNoCalvosFelices = preferencias.getInt("cantNoCalvosFelices", 0);
 
-            if(faces[i].faceAttributes.gender.equals("male")){
-                cantVarones++;
-            }
-            else {
-                cantMujeres++;
-            }
 
-            SharedPreferences.Editor editor;
-            editor = preferencias.edit();
-            editor.putInt("cantVarones", cantVarones);
-            editor.putInt("cantMujeres", cantMujeres);
-            editor.commit();
+        for (int i = 0; i < faces.length; i++) {
 
-            if(i < faces.length -1)
-            {
-                mensaje += "\n";
+            if (faces[i].faceAttributes.emotion.happiness > 0.5) {
+                if (faces[i].faceAttributes.hair.bald > 0) {
+                    cantCalvosFelices++;
+                } else {
+                    cantNoCalvosFelices++;
+                }
             }
 
         }
 
-        mensaje += "- H: " + cantVarones + "- M: " + cantMujeres;
+        arrCant.add(cantCalvosFelices);
+        arrCant.add(cantNoCalvosFelices);
+
     }
+    public void procesarAccesorios(Face[] faces) {
+        int cantMujerVieja = 0, cantMujerJoven = 0;
+        int acumAccesoriosJoven = 0, acumAccesoriosVieja = 0;
+
+        for (int i = 0; i < faces.length; i++) {
+            if (faces[i].faceAttributes.gender.equals("female")) {
+                if (faces[i].faceAttributes.age > 60) {
+                    cantMujerVieja++;
+                    acumAccesoriosVieja += faces[i].faceAttributes.accessories.length;
+                } else {
+                    cantMujerJoven++;
+                    acumAccesoriosJoven += faces[i].faceAttributes.accessories.length;
+                }
+            }
+        }
+
+        int promJoven = acumAccesoriosJoven / cantMujerJoven;
+        int promVieja = acumAccesoriosVieja / cantMujerVieja;
+
+        arrProm.add(promJoven);
+        arrProm.add(promVieja);
+
+    }
+    public void procesarMakeUpFeliz(Face[] faces){
+
+         int cantMakeUpFeliz = 0, cantMakeUpNoFeliz = 0;
+
+        for (int i = 0; i < faces.length; i++) {
+
+            if((faces[i].faceAttributes.makeup.eyeMakeup || faces[i].faceAttributes.makeup.lipMakeup) ) {
+                if(faces[i].faceAttributes.emotion.happiness > 0.5) cantMakeUpFeliz++;
+                else cantMakeUpNoFeliz++;
+            }
+        }
+
+        arrMakeUp.add(cantMakeUpFeliz);
+        arrMakeUp.add(cantMakeUpNoFeliz);
+    }
+
 
 }

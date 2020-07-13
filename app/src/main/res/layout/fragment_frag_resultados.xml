@@ -3,11 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    >
+    android:background="#fff">
 
-    <TextView
+    <lecho.lib.hellocharts.view.PieChartView
+        android:id="@+id/chart"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="fragment resultados" />
+        android:layout_height="match_parent" >
+    </lecho.lib.hellocharts.view.PieChartView>
 
 </FrameLayout>

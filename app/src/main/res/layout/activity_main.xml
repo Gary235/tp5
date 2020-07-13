@@ -40,11 +40,43 @@
         />
 
 
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/check1"
+
+        android:text="Genero"
+        app:layout_constraintLeft_toLeftOf="@id/imagen"
+        app:layout_constraintTop_toBottomOf="@id/imagen"
+        android:layout_marginTop="50dp"
+        />
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/check2"
+
+        android:text="Edad"
+        app:layout_constraintLeft_toLeftOf="@id/check1"
+        app:layout_constraintTop_toBottomOf="@id/check1"
+        android:layout_marginTop="20dp"
+        />
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/check3"
+
+        android:text="Emociones"
+        app:layout_constraintLeft_toLeftOf="@id/check2"
+        app:layout_constraintTop_toBottomOf="@id/check2"
+        android:layout_marginTop="20dp"
+        />
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/holder"
         android:elevation="20dp"
+        android:translationZ="20dp"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
