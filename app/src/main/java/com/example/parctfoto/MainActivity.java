@@ -7,6 +7,9 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -22,6 +25,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -36,10 +40,14 @@ import java.io.InputStream;
 
 public class MainActivity extends AppCompatActivity {
 
-    TextView txtResultado;
+    FrameLayout holder;
+    FragmentManager adminFragment;
+    FragmentTransaction transaccionFragment;
+    Fragment frag;
+
     ImageView img;
     Button foto,gal;
-    Boolean TodosPermisos=false;
+    Boolean TodosPermisos = false;
     FaceServiceRestClient servicioProcesamientoImagenes;
     SharedPreferences preferencias;
     Bitmap bmp;
@@ -53,8 +61,16 @@ public class MainActivity extends AppCompatActivity {
         img=findViewById(R.id.imagen);
         foto=findViewById(R.id.Foto);
         gal=findViewById(R.id.Galeria);
-        txtResultado = findViewById(R.id.txtResultado);
         dialogo = new ProgressDialog(this);
+
+        adminFragment = getFragmentManager();
+        holder = findViewById(R.id.holder);
+        frag = new FragResultados();
+        transaccionFragment=adminFragment.beginTransaction();
+        transaccionFragment.replace(R.id.holder, frag);
+        transaccionFragment.addToBackStack(null);
+        transaccionFragment.commit();
+        holder.setVisibility(View.GONE);
 
         String apiEndPoint = "https://mirecursodeface.cognitiveservices.azure.com/face/v1.0/";
         String subscriptionKey = "d66b28ec4faa40dcbd3d658b44983e0d";
@@ -213,17 +229,12 @@ public class MainActivity extends AppCompatActivity {
             protected void onPostExecute(Face[] faces) {
                 super.onPostExecute(faces);
                 dialogo.dismiss();
-                if(faces == null)
-                {
-                    // error
-                    img.setImageResource(android.R.drawable.ic_dialog_alert);
-                }
+                if(faces == null) { img.setImageResource(android.R.drawable.ic_dialog_alert); }
                 else {
-                    //success
                     if(faces.length > 0)
                     {
-                        //se detecta cara
-                        procesarResultadosdeCara(faces);
+                        //procesarResultadosdeCara(faces);
+                        holder.setVisibility(View.VISIBLE);
                     }
                     else {
                         //No se detecta ninguna cara
@@ -272,7 +283,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         mensaje += "- H: " + cantVarones + "- M: " + cantMujeres;
-        txtResultado.setText(mensaje);
     }
 
 }

@@ -11,17 +11,19 @@
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:scaleType="centerCrop"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginBottom="350dp"/>
+        android:layout_marginTop="50dp"
+        android:layout_marginLeft="20dp"
+        />
     <Button
         android:id="@+id/Foto"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/imagen"
+        app:layout_constraintTop_toTopOf="@id/imagen"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="35dp"
         android:text="Foto"
         android:onClick="OnClick"
         />
@@ -29,25 +31,20 @@
         android:id="@+id/Galeria"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/imagen"
+        app:layout_constraintTop_toBottomOf="@id/Foto"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="25dp"
         android:text="Galeria"
         android:onClick="OnClick"
         />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/txtResultado"
 
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-
-        android:textSize="25dp"
-        android:textColor="#000"
-
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/holder"
+        android:elevation="20dp"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
