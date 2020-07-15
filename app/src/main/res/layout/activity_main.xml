@@ -15,6 +15,7 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="50dp"
         android:layout_marginLeft="20dp"
+        android:src="@android:drawable/ic_menu_camera"
         />
     <Button
         android:id="@+id/Foto"
@@ -111,7 +112,7 @@
         android:id="@+id/holder"
         android:elevation="20dp"
         android:translationZ="20dp"
-        android:layout_marginTop="250dp"
+        android:layout_marginTop="255dp"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
