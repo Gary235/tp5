@@ -25,7 +25,9 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -41,12 +43,14 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    FrameLayout holder;
+    public static FrameLayout holder;
     FragmentManager adminFragment;
     FragmentTransaction transaccionFragment;
     Fragment frag;
 
+    CheckBox check1,check2,check3,check4,check5;
     ImageView img;
+    ImageButton btnFlecha;
     Button foto, gal;
     Boolean TodosPermisos = false;
     FaceServiceRestClient servicioProcesamientoImagenes;
@@ -54,13 +58,22 @@ public class MainActivity extends AppCompatActivity {
     Bitmap bmp;
     ProgressDialog dialogo;
 
-    public static ArrayList<Integer> arrProm = new ArrayList<>(), arrCant = new ArrayList<>(), arrMakeUp = new ArrayList<>();
+    public static ArrayList<Integer>  arrCant = new ArrayList<>();
+    public static ArrayList<Double> arrProm = new ArrayList<>();
+    public static ArrayList<Boolean> arrCheckBox = new ArrayList<>();
+    public static String mensajeEmociones = "Emociones Encontradas: \n";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        btnFlecha = findViewById(R.id.btnFlecha);
+        check1 = findViewById(R.id.check1);
+        check2 = findViewById(R.id.check2);
+        check3 = findViewById(R.id.check3);
+        check4 = findViewById(R.id.check4);
+        check5 = findViewById(R.id.check5);
         img = findViewById(R.id.imagen);
         foto = findViewById(R.id.Foto);
         gal = findViewById(R.id.Galeria);
@@ -192,8 +205,13 @@ public class MainActivity extends AppCompatActivity {
 
                 Face[] resultado = null;
 
-                if (inputStreams[0] != null) {
+                arrCheckBox.add(check1.isChecked());
+                arrCheckBox.add(check2.isChecked());
+                arrCheckBox.add(check3.isChecked());
+                arrCheckBox.add(check4.isChecked());
+                arrCheckBox.add(check5.isChecked());
 
+                if (inputStreams[0] != null) {
                     try {
                         Log.d("Servicio", "Entro al try");
                         FaceServiceClient.FaceAttributeType[] atributos;
@@ -213,10 +231,8 @@ public class MainActivity extends AppCompatActivity {
                                 FaceServiceClient.FaceAttributeType.Noise
                         };
                         Log.d("Servicio", "Sale de atributos, atributos" + atributos);
-
                         resultado = servicioProcesamientoImagenes.detect(inputStreams[0], true, false, atributos);
                         Log.d("Servicio", "Sale del try");
-
                     } catch (Exception error) {
                         Log.d("Servicio", "Error: " + error.getMessage());
                     }
@@ -241,9 +257,23 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     if (faces.length > 0) {
 
+                        arrCant.clear();
+                        arrProm.clear();
+                        mensajeEmociones = "Emociones Encontradas: \n";
+                        btnFlecha.setVisibility(View.VISIBLE);
+                        btnFlecha.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                if(holder.getVisibility() == View.GONE)
+                                {
+                                    holder.setVisibility(View.VISIBLE);
+                                }
+                            }
+                        });
+
                         procesarCalvosFelices(faces);
-                       // procesarAccesorios(faces);
-                       // procesarMakeUpFeliz(faces);
+                        procesarMakeUp(faces);
+                        procesarEmociones(faces);
 
                         frag = new FragResultados();
                         transaccionFragment = adminFragment.beginTransaction();
@@ -251,6 +281,7 @@ public class MainActivity extends AppCompatActivity {
                         transaccionFragment.addToBackStack(null);
                         transaccionFragment.commit();
                         holder.setVisibility(View.VISIBLE);
+
                     } else {
                         //No se detecta ninguna cara
                     }
@@ -286,44 +317,91 @@ public class MainActivity extends AppCompatActivity {
         arrCant.add(cantNoCalvosFelices);
 
     }
-    public void procesarAccesorios(Face[] faces) {
-        int cantMujerVieja = 0, cantMujerJoven = 0;
-        int acumAccesoriosJoven = 0, acumAccesoriosVieja = 0;
+    public void procesarMakeUp(Face[] faces) {
+        double cantMujerVieja = 0, cantMujerJoven = 0;
 
         for (int i = 0; i < faces.length; i++) {
             if (faces[i].faceAttributes.gender.equals("female")) {
                 if (faces[i].faceAttributes.age > 60) {
-                    cantMujerVieja++;
-                    acumAccesoriosVieja += faces[i].faceAttributes.accessories.length;
+                    if(faces[i].faceAttributes.makeup.lipMakeup || faces[i].faceAttributes.makeup.eyeMakeup) cantMujerVieja++;
                 } else {
-                    cantMujerJoven++;
-                    acumAccesoriosJoven += faces[i].faceAttributes.accessories.length;
+                    if(faces[i].faceAttributes.makeup.lipMakeup || faces[i].faceAttributes.makeup.eyeMakeup) cantMujerJoven++;
                 }
             }
         }
 
-        int promJoven = acumAccesoriosJoven / cantMujerJoven;
-        int promVieja = acumAccesoriosVieja / cantMujerVieja;
-
-        arrProm.add(promJoven);
-        arrProm.add(promVieja);
+        arrProm.add(cantMujerJoven);
+        arrProm.add(cantMujerVieja);
 
     }
-    public void procesarMakeUpFeliz(Face[] faces){
-
-         int cantMakeUpFeliz = 0, cantMakeUpNoFeliz = 0;
+    public void procesarEmociones(Face[] faces){
+            Boolean felicidad = false, tristeza= false, enojo= false, disgusto= false,neutral= false,miedo= false,sorpresa= false;
 
         for (int i = 0; i < faces.length; i++) {
 
-            if((faces[i].faceAttributes.makeup.eyeMakeup || faces[i].faceAttributes.makeup.lipMakeup) ) {
-                if(faces[i].faceAttributes.emotion.happiness > 0.5) cantMakeUpFeliz++;
-                else cantMakeUpNoFeliz++;
+            if(faces[i].faceAttributes.emotion.happiness > 0.5){
+                felicidad = true;
             }
+            else if(faces[i].faceAttributes.emotion.anger > 0.5)
+            {
+                enojo = true;
+            }
+            else if(faces[i].faceAttributes.emotion.disgust > 0.5)
+            {
+                disgusto = true;
+            }
+            else if(faces[i].faceAttributes.emotion.sadness > 0.5)
+            {
+                tristeza = true;
+            }
+            else if(faces[i].faceAttributes.emotion.neutral > 0.5)
+            {
+                neutral = true;
+            }
+            else if(faces[i].faceAttributes.emotion.fear > 0.5)
+            {
+                miedo = true;
+            }
+            else if(faces[i].faceAttributes.emotion.surprise > 0.5)
+            {
+                sorpresa = true;
+            }
+
+
+
         }
 
-        arrMakeUp.add(cantMakeUpFeliz);
-        arrMakeUp.add(cantMakeUpNoFeliz);
+        if(felicidad){
+            mensajeEmociones += "Felicidad \n";
+        }
+        else if(tristeza)
+        {
+            mensajeEmociones += "Tristeza \n";
+        }
+        else if(enojo)
+        {
+            mensajeEmociones += "Enojo \n";
+        }
+        else if(disgusto)
+        {
+            mensajeEmociones += "Disgusto \n";
+        }
+        else if(neutral)
+        {
+            mensajeEmociones += "Neutralidad \n";
+        }
+        else if(miedo)
+        {
+            mensajeEmociones += "Miedo \n";
+        }
+        else if(sorpresa)
+        {
+            mensajeEmociones += "Sorpresa \n";
+        }
+
+
     }
+
 
 
 }

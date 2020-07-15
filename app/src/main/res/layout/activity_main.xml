@@ -71,12 +71,47 @@
         app:layout_constraintTop_toBottomOf="@id/check2"
         android:layout_marginTop="20dp"
         />
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/check4"
+
+        android:text="Maquillaje"
+        app:layout_constraintLeft_toLeftOf="@id/check3"
+        app:layout_constraintTop_toBottomOf="@id/check3"
+        android:layout_marginTop="20dp"
+        />
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/check5"
+
+        android:text="Pelo"
+        app:layout_constraintLeft_toLeftOf="@id/check4"
+        app:layout_constraintTop_toBottomOf="@id/check4"
+        android:layout_marginTop="20dp"
+        />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnFlecha"
+        android:src="@drawable/ic_flecha_fina_negra_arriba"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginRight="50dp"
+        android:layout_marginBottom="100dp"
+        android:visibility="gone"
+        />
+
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/holder"
         android:elevation="20dp"
         android:translationZ="20dp"
+        android:layout_marginTop="250dp"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
