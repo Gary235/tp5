@@ -57,17 +57,20 @@ public class MainActivity extends AppCompatActivity {
     SharedPreferences preferencias;
     Bitmap bmp;
     ProgressDialog dialogo;
-
+    public static double promEdad;
     public static ArrayList<Integer>  arrCant = new ArrayList<>();
-    public static ArrayList<Double> arrProm = new ArrayList<>();
+    public static ArrayList<Float> arrProm = new ArrayList<>();
     ArrayList<Boolean> arrCheckBox = new ArrayList<>();
+    public static int cantH;
+    public static int cantM;
     public static String mensajeEmociones = "Emociones Encontradas: \n";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        cantH=0; cantM=0;
         btnFlecha = findViewById(R.id.btnFlecha);
         check1 = findViewById(R.id.check1);
         check2 = findViewById(R.id.check2);
@@ -276,6 +279,8 @@ public class MainActivity extends AppCompatActivity {
                         procesarCalvosFelices(faces);
                         procesarMakeUp(faces);
                         procesarEmociones(faces);
+                        procesarCantSexo(faces);
+                        procesarEdades(faces);
 
                         frag = new FragResultados();
                         transaccionFragment = adminFragment.beginTransaction();
@@ -306,7 +311,7 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < faces.length; i++) {
 
             if (faces[i].faceAttributes.emotion.happiness > 0.5) {
-                if (faces[i].faceAttributes.hair.bald > 0) {
+                if (faces[i].faceAttributes.hair.bald > 0.5) {
                     cantCalvosFelices++;
                 } else {
                     cantNoCalvosFelices++;
@@ -320,7 +325,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
     public void procesarMakeUp(Face[] faces) {
-        double cantMujerVieja = 0, cantMujerJoven = 0;
+        float cantMujerVieja = 0, cantMujerJoven = 0;
 
         for (int i = 0; i < faces.length; i++) {
             if (faces[i].faceAttributes.gender.equals("female")) {
@@ -403,7 +408,27 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-
+    public void procesarCantSexo(Face[] faces) {
+        for (int i = 0; i < faces.length; i++) {
+            if (faces[i].faceAttributes.gender.equals("female")) {
+                cantM++;
+            } else {
+                cantH++;
+            }
+        }
+    }
+    public void procesarEdades(Face[] faces) {
+        Double acumEdades = 0.0; int cant=0;
+        for (int i = 0; i < faces.length; i++) {
+            acumEdades+=faces[i].faceAttributes.age;
+            cant++;
+        }
+        promEdad =acumEdades/cant;
+    }
+    
+    
+    
+    //------
     public ArrayList<Boolean> devolverCheck()
     {
             return arrCheckBox;

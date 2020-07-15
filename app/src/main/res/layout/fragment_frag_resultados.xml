@@ -6,12 +6,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/fondo_resultados">
 
-   <!--> <lecho.lib.hellocharts.view.PieChartView
+    <lecho.lib.hellocharts.view.PieChartView
+        android:visibility="gone"
         android:id="@+id/chart"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="300dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginTop="90dp"
+
+        >
     </lecho.lib.hellocharts.view.PieChartView>
-<-->
 
     <ImageButton
         android:layout_width="wrap_content"
@@ -22,15 +27,24 @@
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginRight="50dp"
         />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnSiguiente"
+        android:src="@drawable/ic_flecha_fina_negra_derecha"
+        app:layout_constraintTop_toTopOf="@id/txtCalvos"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="300dp"
+        android:layout_marginRight="50dp"
+        />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/txtCalvos"
-
         android:text=""
         android:textSize="20dp"
         android:textColor="#000"
-
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginTop="50dp"
@@ -39,27 +53,10 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/txtAccesorios"
-
-        android:text=""
-        android:textSize="20dp"
-        android:textColor="#000"
-
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginTop="130dp"
-        android:layout_marginLeft="20dp"
-        />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:id="@+id/txtEmociones"
-
         android:text=""
         android:textSize="20dp"
         android:textColor="#000"
-
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginTop="200dp"
