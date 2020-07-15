@@ -36,7 +36,7 @@ public class FragResultados extends Fragment {
 
     TextView txtCalvos, txtAccesorios, txtEmociones;
     ImageButton btnVolver;
-
+    ArrayList<Boolean> arrBool = new ArrayList<>();
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -53,18 +53,25 @@ public class FragResultados extends Fragment {
         txtAccesorios.setText("" );
         txtEmociones.setText("");
 
+        MainActivity main = (MainActivity) getActivity();
+        arrBool = main.devolverCheck();
 
-        if(MainActivity.arrCheckBox.get(0) && MainActivity.arrCheckBox.get(3))
+        if(arrBool.get(0) && arrBool.get(3))
         {
             txtAccesorios.setText("Mujeres Jovenes Maquilladas: " + MainActivity.arrProm.get(0) + "\nMujeres Viejas Maquilladas: " + MainActivity.arrProm.get(1) );
         }
-
-        if(MainActivity.arrCheckBox.get(4) && MainActivity.arrCheckBox.get(2)) {
+        if(arrBool.get(4) && arrBool.get(2)) {
             txtCalvos.setText("Calvos Felices: " + MainActivity.arrCant.get(0) + "\nNo Calvos Felices: " + MainActivity.arrCant.get(1));
         }
-        if(MainActivity.arrCheckBox.get(4)){
+        if(arrBool.get(2)){
             txtEmociones.setText(MainActivity.mensajeEmociones);
         }
+
+        if(txtCalvos.getText() == "" && txtEmociones.getText() == "" && txtAccesorios.getText() == "")
+        {
+            txtCalvos.setText("Habilite los rasgos para\nobtener Resultados");
+        }
+
 
         btnVolver.setOnClickListener(new View.OnClickListener() {
             @Override

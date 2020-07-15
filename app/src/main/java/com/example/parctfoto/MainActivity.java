@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static ArrayList<Integer>  arrCant = new ArrayList<>();
     public static ArrayList<Double> arrProm = new ArrayList<>();
-    public static ArrayList<Boolean> arrCheckBox = new ArrayList<>();
+    ArrayList<Boolean> arrCheckBox = new ArrayList<>();
     public static String mensajeEmociones = "Emociones Encontradas: \n";
 
     @Override
@@ -96,6 +96,8 @@ public class MainActivity extends AppCompatActivity {
             Log.d("Servicio", error.getMessage());
         }
 
+
+
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
                 ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED ||
                 ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
@@ -105,6 +107,17 @@ public class MainActivity extends AppCompatActivity {
                     Manifest.permission.INTERNET
             }, 1);
         }
+
+        btnFlecha.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(holder.getVisibility() == View.GONE)
+                {
+                    procesarImagenObtenida(bmp);
+                }
+            }
+        });
+
     }
 
     @Override
@@ -143,12 +156,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
-        super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
-        Uri selectedImageUri = null;
-        Uri selectedImage;
+        super.onActivityResult(requestCode, resultCode, imageReturnedIntent);Uri selectedImage;
 
         bmp = null;
-        String filePath = null;
         switch (requestCode) {
             case 1:
                 if (resultCode == Activity.RESULT_OK) {
@@ -201,10 +211,11 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             protected Face[] doInBackground(InputStream... inputStreams) {
-                publishProgress("Detectando caras...");
+                publishProgress("Cargando...");
 
                 Face[] resultado = null;
 
+                arrCheckBox.clear();
                 arrCheckBox.add(check1.isChecked());
                 arrCheckBox.add(check2.isChecked());
                 arrCheckBox.add(check3.isChecked());
@@ -261,15 +272,6 @@ public class MainActivity extends AppCompatActivity {
                         arrProm.clear();
                         mensajeEmociones = "Emociones Encontradas: \n";
                         btnFlecha.setVisibility(View.VISIBLE);
-                        btnFlecha.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                if(holder.getVisibility() == View.GONE)
-                                {
-                                    holder.setVisibility(View.VISIBLE);
-                                }
-                            }
-                        });
 
                         procesarCalvosFelices(faces);
                         procesarMakeUp(faces);
@@ -402,6 +404,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
+    public ArrayList<Boolean> devolverCheck()
+    {
+            return arrCheckBox;
+    }
 
 }
