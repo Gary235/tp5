@@ -6,61 +6,118 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/fondo_resultados">
 
-    <lecho.lib.hellocharts.view.PieChartView
-        android:visibility="gone"
-        android:id="@+id/chart"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginTop="90dp"
-
-        >
-    </lecho.lib.hellocharts.view.PieChartView>
-
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/btnvolver"
         android:src="@drawable/ic_flecha_fina_negra_abajo"
-        app:layout_constraintTop_toTopOf="@id/txtCalvos"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginRight="50dp"
+        android:layout_marginTop="50dp"
+        android:elevation="20dp"
+        android:translationZ="20dp"
         />
 
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/btnSiguiente"
-        android:src="@drawable/ic_flecha_fina_negra_derecha"
-        app:layout_constraintTop_toTopOf="@id/txtCalvos"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginTop="300dp"
-        android:layout_marginRight="50dp"
-        />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/txtCalvos"
-        android:text=""
-        android:textSize="20dp"
-        android:textColor="#000"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginTop="50dp"
-        android:layout_marginLeft="20dp"
-    />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/txtEmociones"
-        android:text=""
-        android:textSize="20dp"
-        android:textColor="#000"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginTop="200dp"
-        android:layout_marginLeft="20dp"
-        />
+    <ScrollView
+        android:id="@+id/scrolView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="-81dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txtCalvos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="50dp"
+                android:elevation="20dp"
+                android:textColor="#000"
+                android:textSize="20dp"
+                android:translationZ="20dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/chart" />
+
+            <lecho.lib.hellocharts.view.PieChartView
+                android:id="@+id/chart"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:layout_marginTop="90dp"
+                android:elevation="20dp"
+                android:translationZ="20dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <lecho.lib.hellocharts.view.PieChartView
+                android:id="@+id/chart2"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:layout_marginTop="20dp"
+                android:elevation="20dp"
+                android:translationZ="20dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/chart" />
+
+            <lecho.lib.hellocharts.view.PieChartView
+                android:id="@+id/chart3"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:layout_marginTop="20dp"
+                android:elevation="20dp"
+                android:translationZ="20dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/chart2" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/promEdad"
+                app:layout_constraintTop_toBottomOf="@+id/chart3"
+                app:layout_constraintLeft_toLeftOf="@id/chart3"
+                app:layout_constraintRight_toRightOf="@id/chart3"
+
+                android:textColor="#000"
+                android:textSize="50dp"
+                android:layout_marginTop="50dp"
+
+                />
+
+            <ProgressBar
+                android:id="@+id/progress"
+                style="@android:style/Widget.Material.Light.ProgressBar.Horizontal"
+                android:layout_width="200dp"
+                android:layout_height="50dp"
+
+                app:layout_constraintTop_toBottomOf="@+id/promEdad"
+                app:layout_constraintLeft_toLeftOf="@id/promEdad"
+                app:layout_constraintRight_toRightOf="@id/promEdad"
+
+                />
+
+
+            <ListView
+                android:visibility="gone"
+                android:id="@+id/listEmociones"
+                android:layout_width="300dp"
+                android:layout_height="500dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="50dp"
+                android:elevation="20dp"
+                android:text=""
+                android:textColor="#000"
+                android:textSize="20dp"
+                android:translationZ="20dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/progress" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

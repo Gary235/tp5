@@ -57,10 +57,13 @@ public class MainActivity extends AppCompatActivity {
     SharedPreferences preferencias;
     Bitmap bmp;
     ProgressDialog dialogo;
-    public static double promEdad;
+
     public static ArrayList<Integer>  arrCant = new ArrayList<>();
     public static ArrayList<Float> arrProm = new ArrayList<>();
     ArrayList<Boolean> arrCheckBox = new ArrayList<>();
+    public static ArrayList<Emocion> arrEmociones = new ArrayList<>();
+
+    public static double promEdad;
     public static int cantH;
     public static int cantM;
     public static String mensajeEmociones = "Emociones Encontradas: \n";
@@ -341,8 +344,9 @@ public class MainActivity extends AppCompatActivity {
         arrProm.add(cantMujerVieja);
 
     }
+
     public void procesarEmociones(Face[] faces){
-            Boolean felicidad = false, tristeza= false, enojo= false, disgusto= false,neutral= false,miedo= false,sorpresa= false;
+        boolean felicidad = false, tristeza= false, enojo= false, disgusto= false,neutral= false,miedo= false,sorpresa= false;
 
         for (int i = 0; i < faces.length; i++) {
 
@@ -374,37 +378,48 @@ public class MainActivity extends AppCompatActivity {
                 sorpresa = true;
             }
 
+        }
+            Emocion emocion;
 
+            emocion = new Emocion();
+            emocion.setNombre("Felicidad");
+            emocion.setHayoNo(felicidad);
+            arrEmociones.add(emocion);
 
-        }
+            emocion = new Emocion();
+            emocion.setNombre("Tristeza");
+            emocion.setHayoNo(tristeza);
+            arrEmociones.add(emocion);
 
-        if(felicidad){
-            mensajeEmociones += "Felicidad \n";
-        }
-        else if(tristeza)
-        {
-            mensajeEmociones += "Tristeza \n";
-        }
-        else if(enojo)
-        {
-            mensajeEmociones += "Enojo \n";
-        }
-        else if(disgusto)
-        {
-            mensajeEmociones += "Disgusto \n";
-        }
-        else if(neutral)
-        {
-            mensajeEmociones += "Neutralidad \n";
-        }
-        else if(miedo)
-        {
-            mensajeEmociones += "Miedo \n";
-        }
-        else if(sorpresa)
-        {
-            mensajeEmociones += "Sorpresa \n";
-        }
+            emocion = new Emocion();
+
+            emocion.setNombre("Enojo");
+            emocion.setHayoNo(enojo);
+            arrEmociones.add(emocion);
+
+            emocion = new Emocion();
+
+            emocion.setNombre("Disgusto");
+            emocion.setHayoNo(disgusto);
+            arrEmociones.add(emocion);
+
+            emocion = new Emocion();
+
+            emocion.setNombre("Neutralidad");
+            emocion.setHayoNo(neutral);
+            arrEmociones.add(emocion);
+
+            emocion = new Emocion();
+
+            emocion.setNombre("Miedo");
+            emocion.setHayoNo(miedo);
+            arrEmociones.add(emocion);
+
+            emocion = new Emocion();
+
+            emocion.setNombre("Sorpresa");
+            emocion.setHayoNo(sorpresa);
+            arrEmociones.add(emocion);
 
 
     }
@@ -423,7 +438,7 @@ public class MainActivity extends AppCompatActivity {
             acumEdades+=faces[i].faceAttributes.age;
             cant++;
         }
-        promEdad =acumEdades/cant;
+        promEdad = acumEdades/cant;
     }
     
     

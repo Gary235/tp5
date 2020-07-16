@@ -110,8 +110,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/holder"
-        android:elevation="20dp"
-        android:translationZ="20dp"
+        android:elevation="100dp"
+        android:translationZ="100dp"
         android:layout_marginTop="255dp"
         />
 

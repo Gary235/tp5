@@ -11,6 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -24,32 +26,34 @@ import lecho.lib.hellocharts.view.PieChartView;
 
 public class FragResultados extends Fragment {
 
-    private PieChartView chart;
+    private PieChartView chart,chart2,chart3;
 
-    private boolean hasLabels = false;
-    private boolean hasLabelsOutside = false;
-    private boolean hasCenterCircle = false;
-    private boolean hasCenterText1 = false;
-    private boolean hasCenterText2 = false;
-    private boolean isExploded = false;
-    private boolean hasLabelForSelected = false;
 
-    TextView txtCalvos, txtAccesorios, txtEmociones;
+    TextView txtCalvos, txtEdad;
+    ListView listEmociones;
     ImageButton btnVolver;
     ArrayList<Boolean> arrBool = new ArrayList<>();
+    ProgressBar progressBar;
+    adaptadorDeEmociones adaptadorDeEmociones;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_frag_resultados, container, false);;
 
         chart =  v.findViewById(R.id.chart);
-        generateDataCalvos();
+        chart2 = v.findViewById(R.id.chart2);
+        chart3 = v.findViewById(R.id.chart3);
         txtCalvos = v.findViewById(R.id.txtCalvos);
-        txtEmociones = v.findViewById(R.id.txtEmociones);
+        listEmociones = v.findViewById(R.id.listEmociones);
+        txtEdad = v.findViewById(R.id.promEdad);
         btnVolver = v.findViewById(R.id.btnvolver);
+        progressBar = v.findViewById(R.id.progress);
+        progressBar.setMax(100);
 
+        adaptadorDeEmociones = new adaptadorDeEmociones(getActivity(),MainActivity.arrEmociones);
+        listEmociones.setAdapter(adaptadorDeEmociones);
         txtCalvos.setText("");
-        txtEmociones.setText("");
+        txtEdad.setText("");
 
         MainActivity main = (MainActivity) getActivity();
         arrBool = main.devolverCheck();
@@ -57,27 +61,29 @@ public class FragResultados extends Fragment {
         if(arrBool.get(0))
         {
             generateDataSexo();
-            chart.setVisibility(View.VISIBLE);
         }
         if(arrBool.get(1))
         {
-            txtEmociones.setText( ""+MainActivity.promEdad);
+            txtEdad.setText( "" + MainActivity.promEdad);
+            progressBar.setProgress((int) MainActivity.promEdad);
         }
         if(arrBool.get(0) && arrBool.get(3))
         {
             generateDataMaquillaje();
-            chart.setVisibility(View.VISIBLE);
         }
         if(arrBool.get(4) && arrBool.get(2)) {
             generateDataCalvos();
-            chart.setVisibility(View.VISIBLE);
         }
         if(arrBool.get(2)){
-            txtEmociones.setText(MainActivity.mensajeEmociones);
+            listEmociones.setVisibility(View.VISIBLE);
         }
-
-        if(txtCalvos.getText() == "" && txtEmociones.getText() == "" && chart.getVisibility()==View.GONE )
+        if(!arrBool.get(0) && !arrBool.get(1) && !arrBool.get(2) && !arrBool.get(3) && !arrBool.get(4))
         {
+            chart.setVisibility(View.GONE);
+            chart2.setVisibility(View.GONE);
+            chart3.setVisibility(View.GONE);
+            progressBar.setVisibility(View.GONE);
+            listEmociones.setVisibility(View.GONE);
             txtCalvos.setText("Habilite los rasgos para\nobtener Resultados");
         }
 
@@ -97,32 +103,52 @@ public class FragResultados extends Fragment {
         int calvosF= MainActivity.arrCant.get(0);
         int noCalvosF= MainActivity.arrCant.get(1);
         int total= MainActivity.arrCant.get(0)+MainActivity.arrCant.get(1);
-        float porCalvo= (calvosF*100)/total;
-        float porNCalvo= (noCalvosF*100)/total;
-        pieData.add(new SliceValue(porCalvo, Color.BLUE).setLabel("Calvos"));
-        pieData.add(new SliceValue(porNCalvo, Color.GRAY).setLabel("No Calvos"));
+        Log.d("Calvos", "calvos " + calvosF + " no calvos " + noCalvosF);
+        if(calvosF == 0 && noCalvosF == 0) {
+            float porCalvo= 1;
+            float porNCalvo= 1;
+            pieData.add(new SliceValue(porCalvo, ChartUtils.pickColor()).setLabel("Calvos: 0" ));
+            pieData.add(new SliceValue(porNCalvo, ChartUtils.pickColor()).setLabel("No Calvos: 0" ));
+        }
+        else {
+            float porCalvo= (calvosF*100)/total;
+            float porNCalvo= (noCalvosF*100)/total;
+            pieData.add(new SliceValue(porCalvo, ChartUtils.pickColor()).setLabel("Calvos: " + calvosF));
+            pieData.add(new SliceValue(porNCalvo, ChartUtils.pickColor()).setLabel("No Calvos: " + noCalvosF));
+        }
         PieChartData pieChartData = new PieChartData(pieData);
         pieChartData.setHasLabels(true).setValueLabelTextSize(14);
         pieChartData.setHasCenterCircle(true).setCenterText1("Felicidad").setCenterText1FontSize(20).setCenterText1Color(Color.parseColor("#0097A7"));
         chart.setPieChartData(pieChartData);
 
     }
+
     private void generateDataMaquillaje() {
         MainActivity main = (MainActivity) getActivity();
         List pieData = new ArrayList<>();
         float JovenesM=MainActivity.arrProm.get(0);
         float ViejasM= MainActivity.arrProm.get(1);
         float total= MainActivity.arrProm.get(0)+MainActivity.arrProm.get(1);
-        float porJov= (JovenesM*100)/total;
-        float porViej= (ViejasM*100)/total;
-        pieData.add(new SliceValue(porJov, Color.BLUE).setLabel("Jovenes"));
-        pieData.add(new SliceValue(porViej, Color.GRAY).setLabel("Viejas"));
+
+        if(JovenesM == 0 && ViejasM == 0) {
+            float porJov= 1;
+            float porViej= 1;
+            pieData.add(new SliceValue(porJov, ChartUtils.pickColor()).setLabel("Jovenes: 0" ));
+            pieData.add(new SliceValue(porViej, ChartUtils.pickColor()).setLabel("Viejas: 0" ));
+        }
+        else {
+            float porJov= (JovenesM*100)/total;
+            float porViej= (ViejasM*100)/total;
+            pieData.add(new SliceValue(porJov, ChartUtils.pickColor()).setLabel("Jovenes: " + JovenesM));
+            pieData.add(new SliceValue(porViej, ChartUtils.pickColor()).setLabel("Viejas: " + ViejasM));
+        }
         PieChartData pieChartData = new PieChartData(pieData);
         pieChartData.setHasLabels(true).setValueLabelTextSize(14);
         pieChartData.setHasCenterCircle(true).setCenterText1("Maquillaje").setCenterText1FontSize(20).setCenterText1Color(Color.parseColor("#0097A7"));
-        chart.setPieChartData(pieChartData);
+        chart2.setPieChartData(pieChartData);
 
     }
+
     private void generateDataSexo() {
         MainActivity main = (MainActivity) getActivity();
         List pieData = new ArrayList<>();
@@ -131,12 +157,12 @@ public class FragResultados extends Fragment {
         float total= Hombres+Mujeres;
         float porH= (Hombres*100)/total;
         float porM= (Mujeres*100)/total;
-        pieData.add(new SliceValue(porH, Color.BLUE).setLabel("Hombres"));
-        pieData.add(new SliceValue(porM, Color.GRAY).setLabel("Mujeres"));
+        pieData.add(new SliceValue(porH, ChartUtils.pickColor()).setLabel("Hombres: " + Hombres));
+        pieData.add(new SliceValue(porM, ChartUtils.pickColor()).setLabel("Mujeres: " + Mujeres));
         PieChartData pieChartData = new PieChartData(pieData);
         pieChartData.setHasLabels(true).setValueLabelTextSize(14);
         pieChartData.setHasCenterCircle(true).setCenterText1("Cantidad").setCenterText1FontSize(20).setCenterText1Color(Color.parseColor("#0097A7"));
-        chart.setPieChartData(pieChartData);
+        chart3.setPieChartData(pieChartData);
 
     }
 
