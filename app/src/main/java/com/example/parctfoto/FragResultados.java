@@ -51,27 +51,32 @@ public class FragResultados extends Fragment {
         progressBar.setMax(100);
 
         adaptadorDeEmociones = new adaptadorDeEmociones(getActivity(),MainActivity.arrEmociones);
-        listEmociones.setAdapter(adaptadorDeEmociones);
         txtCalvos.setText("");
         txtEdad.setText("");
+        listEmociones.setAdapter(null);
 
         MainActivity main = (MainActivity) getActivity();
         arrBool = main.devolverCheck();
+        listEmociones.setAdapter(adaptadorDeEmociones);
 
         if(arrBool.get(0))
         {
+            chart3.setVisibility(View.VISIBLE);
             generateDataSexo();
         }
         if(arrBool.get(1))
         {
             txtEdad.setText( "" + MainActivity.promEdad);
+            progressBar.setVisibility(View.VISIBLE);
             progressBar.setProgress((int) MainActivity.promEdad);
         }
         if(arrBool.get(0) && arrBool.get(3))
         {
+            chart2.setVisibility(View.VISIBLE);
             generateDataMaquillaje();
         }
         if(arrBool.get(4) && arrBool.get(2)) {
+            chart.setVisibility(View.VISIBLE);
             generateDataCalvos();
         }
         if(arrBool.get(2)){
@@ -79,11 +84,6 @@ public class FragResultados extends Fragment {
         }
         if(!arrBool.get(0) && !arrBool.get(1) && !arrBool.get(2) && !arrBool.get(3) && !arrBool.get(4))
         {
-            chart.setVisibility(View.GONE);
-            chart2.setVisibility(View.GONE);
-            chart3.setVisibility(View.GONE);
-            progressBar.setVisibility(View.GONE);
-            listEmociones.setVisibility(View.GONE);
             txtCalvos.setText("Habilite los rasgos para\nobtener Resultados");
         }
 

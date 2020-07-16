@@ -227,6 +227,10 @@ public class MainActivity extends AppCompatActivity {
                 arrCheckBox.add(check3.isChecked());
                 arrCheckBox.add(check4.isChecked());
                 arrCheckBox.add(check5.isChecked());
+                arrEmociones.clear();
+                cantH = 0;
+                cantM = 0;
+
 
                 if (inputStreams[0] != null) {
                     try {
