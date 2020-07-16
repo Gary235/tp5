@@ -29,9 +29,10 @@ public class FragResultados extends Fragment {
     private PieChartView chart,chart2,chart3;
 
 
-    TextView txtCalvos, txtEdad;
+    TextView txtEdad;
     ListView listEmociones;
     ImageButton btnVolver;
+    ImageView imgWarning;
     ArrayList<Boolean> arrBool = new ArrayList<>();
     ProgressBar progressBar;
     adaptadorDeEmociones adaptadorDeEmociones;
@@ -43,7 +44,7 @@ public class FragResultados extends Fragment {
         chart =  v.findViewById(R.id.chart);
         chart2 = v.findViewById(R.id.chart2);
         chart3 = v.findViewById(R.id.chart3);
-        txtCalvos = v.findViewById(R.id.txtCalvos);
+        imgWarning = v.findViewById(R.id.imgWarning);
         listEmociones = v.findViewById(R.id.listEmociones);
         txtEdad = v.findViewById(R.id.promEdad);
         btnVolver = v.findViewById(R.id.btnvolver);
@@ -51,7 +52,6 @@ public class FragResultados extends Fragment {
         progressBar.setMax(100);
 
         adaptadorDeEmociones = new adaptadorDeEmociones(getActivity(),MainActivity.arrEmociones);
-        txtCalvos.setText("");
         txtEdad.setText("");
         listEmociones.setAdapter(null);
 
@@ -84,9 +84,8 @@ public class FragResultados extends Fragment {
         }
         if(!arrBool.get(0) && !arrBool.get(1) && !arrBool.get(2) && !arrBool.get(3) && !arrBool.get(4))
         {
-            txtCalvos.setText("Habilite los rasgos para\nobtener Resultados");
+            imgWarning.setVisibility(View.VISIBLE);
         }
-
 
         btnVolver.setOnClickListener(new View.OnClickListener() {
             @Override

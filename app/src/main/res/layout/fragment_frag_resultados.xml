@@ -6,6 +6,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/fondo_resultados">
 
+
+
+
+
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -31,29 +35,43 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
-
             <TextView
-                android:id="@+id/txtCalvos"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:layout_marginTop="50dp"
-                android:elevation="20dp"
-                android:textColor="#000"
-                android:textSize="20dp"
-                android:translationZ="20dp"
+                android:id="@+id/titulo"
+
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/chart" />
+                android:layout_marginTop="50dp"
+
+                android:textColor="#000"
+                android:text="Resultados"
+                android:textSize="30dp"
+
+                />
+            <ImageView
+                android:id="@+id/imgWarning"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:elevation="20dp"
+                android:translationZ="20dp"
+                android:src="@drawable/ic_warning"
+                android:background="@drawable/transparente"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/titulo"
+                android:visibility="gone"/>
 
             <lecho.lib.hellocharts.view.PieChartView
                 android:id="@+id/chart"
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
-                android:layout_marginTop="90dp"
+                android:layout_marginTop="30dp"
                 android:elevation="20dp"
                 android:translationZ="20dp"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/titulo"
                 android:visibility="gone"
                 />
 
