@@ -46,6 +46,8 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
+import lecho.lib.hellocharts.util.ChartUtils;
+
 public class MainActivity extends AppCompatActivity {
 
     public static FrameLayout holder;
@@ -347,9 +349,9 @@ public class MainActivity extends AppCompatActivity {
         pincel.setAntiAlias(true);
         pincel.setStyle(Paint.Style.STROKE);
         pincel.setStrokeWidth(5);
-        pincel.setColor(Color.RED);
         for (Face unaCara:faces)
         {
+            pincel.setColor( ChartUtils.pickColor());
             FaceRectangle rectanguloCara=unaCara.faceRectangle;
             lienzo.drawRect(rectanguloCara.left,rectanguloCara.top,rectanguloCara.left+rectanguloCara.width,rectanguloCara.top+rectanguloCara.height,pincel);
         }
