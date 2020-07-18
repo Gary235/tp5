@@ -17,6 +17,9 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.media.FaceDetector;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -35,6 +38,7 @@ import android.widget.Toast;
 import com.microsoft.projectoxford.face.FaceServiceClient;
 import com.microsoft.projectoxford.face.FaceServiceRestClient;
 import com.microsoft.projectoxford.face.contract.Face;
+import com.microsoft.projectoxford.face.contract.FaceRectangle;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -52,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
     CheckBox check1,check2,check3,check4,check5,check6;
     ImageView img;
     ImageButton btnFlecha;
-    Button foto, gal;
+    Button foto, gal,borrar;
     Boolean TodosPermisos = false;
     FaceServiceRestClient servicioProcesamientoImagenes;
     SharedPreferences preferencias;
@@ -67,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
     public static double promEdad, promEdadAcum;
     public static int cantH, cantHAcum;
     public static int cantM, cantMAcum;
-
+    public static int cantFotos=0;
     Double acumEdadesAcum = 0.0; int cantAcum=0;
     float cantMujerViejaAcum = 0, cantMujerJovenAcum = 0;
     int cantCalvosFelicesAcum = 0, cantNoCalvosFelicesAcum  = 0;
@@ -89,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
         foto = findViewById(R.id.Foto);
         gal = findViewById(R.id.Galeria);
         dialogo = new ProgressDialog(this);
-
+        borrar= findViewById(R.id.BorraDatos);
         adminFragment = getFragmentManager();
         holder = findViewById(R.id.holder);
         holder.setVisibility(View.GONE);
@@ -124,6 +128,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if(holder.getVisibility() == View.GONE)
                 {
+
                     procesarImagenObtenida(bmp);
                 }
             }
@@ -158,11 +163,25 @@ public class MainActivity extends AppCompatActivity {
             intent.setAction(Intent.ACTION_GET_CONTENT);
             startActivityForResult(Intent.createChooser(intent, "Seleccione una imagen"), 1);
 
-        } else {
+        }
+        if(borrar.getId() == botonApretado.getId())
+        {
+            cantCalvosFelicesAcum=0;
+            cantNoCalvosFelicesAcum=0;
+            cantMujerViejaAcum=0;
+            cantMujerJovenAcum=0;
+            cantHAcum=0;
+            cantMAcum=0;
+            cantAcum=0;
+            acumEdadesAcum=0.0;
+            cantFotos=0;
+        }
+        if(foto.getId() == botonApretado.getId()){
             Intent llamarASacarFoto;
             llamarASacarFoto = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             startActivityForResult(llamarASacarFoto, 2);
         }
+
     }
 
     @Override
@@ -207,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void procesarImagenObtenida(final Bitmap imagenAProcesar) {
-
+        cantFotos++;
         ByteArrayOutputStream streamSalida = new ByteArrayOutputStream();
         imagenAProcesar.compress(Bitmap.CompressFormat.JPEG, 100, streamSalida);
         ByteArrayInputStream streamEntrada = new ByteArrayInputStream(streamSalida.toByteArray());
@@ -287,7 +306,6 @@ public class MainActivity extends AppCompatActivity {
                     img.setImageResource(android.R.drawable.ic_dialog_alert);
                 } else {
                     if (faces.length > 0) {
-
                         arrCant.clear();
                         arrProm.clear();
                         btnFlecha.setVisibility(View.VISIBLE);
@@ -305,6 +323,7 @@ public class MainActivity extends AppCompatActivity {
                         transaccionFragment.addToBackStack(null);
                         transaccionFragment.commit();
                         holder.setVisibility(View.VISIBLE);
+                        encuadrarCaras(faces,bmp);
 
                     } else {
                         //No se detecta ninguna cara
@@ -319,7 +338,23 @@ public class MainActivity extends AppCompatActivity {
         procesarImagen miTarea = new procesarImagen();
         miTarea.execute(streamEntrada);
     }
-
+    public void encuadrarCaras (Face[] faces, Bitmap imag)
+    {
+        Bitmap imgAdibujar;
+        imgAdibujar=imag.copy(Bitmap.Config.ARGB_8888,true);
+        Canvas lienzo = new Canvas(imgAdibujar);
+        Paint pincel = new Paint();
+        pincel.setAntiAlias(true);
+        pincel.setStyle(Paint.Style.STROKE);
+        pincel.setStrokeWidth(5);
+        pincel.setColor(Color.RED);
+        for (Face unaCara:faces)
+        {
+            FaceRectangle rectanguloCara=unaCara.faceRectangle;
+            lienzo.drawRect(rectanguloCara.left,rectanguloCara.top,rectanguloCara.left+rectanguloCara.width,rectanguloCara.top+rectanguloCara.height,pincel);
+        }
+        img.setImageBitmap(imgAdibujar);
+    }
     public  void procesarCalvosFelices(Face[] faces) {
         int cantCalvosFelices = 0, cantNoCalvosFelices = 0;
 
@@ -357,7 +392,6 @@ public class MainActivity extends AppCompatActivity {
         arrProm.add(cantMujerVieja);
 
     }
-
     public void procesarEmociones(Face[] faces){
         boolean felicidad = false, tristeza= false, enojo= false, disgusto= false,neutral= false,miedo= false,sorpresa= false;
 
@@ -453,9 +487,8 @@ public class MainActivity extends AppCompatActivity {
         }
         promEdad = acumEdades/cant;
     }
-
     public void procesarGeneral(Face[] faces){
-
+        arrCantAcum.clear();
         for (int i = 0; i < faces.length; i++) {
 
             if (faces[i].faceAttributes.emotion.happiness > 0.5) {
@@ -473,7 +506,7 @@ public class MainActivity extends AppCompatActivity {
 
         ///////////////////////////////////////////////////////////////////////////
 
-
+        arrPromAcum.clear();
         for (int i = 0; i < faces.length; i++) {
             if (faces[i].faceAttributes.gender.equals("female")) {
                 if (faces[i].faceAttributes.age > 60) {
@@ -504,11 +537,7 @@ public class MainActivity extends AppCompatActivity {
             cantAcum++;
         }
         promEdadAcum = acumEdadesAcum/cantAcum;
-
-
     }
-    
-    
     //------
     public ArrayList<Boolean> devolverCheck()
     {

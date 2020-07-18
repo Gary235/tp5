@@ -29,13 +29,14 @@ public class FragResultados extends Fragment {
     private PieChartView chart ,chart2,chart3;
 
 
-    TextView txtEdad;
+    TextView txtEdad,    txtResultados;
     ListView listEmociones;
     ImageButton btnVolver;
     ImageView imgWarning;
     ArrayList<Boolean> arrBool = new ArrayList<>();
     ProgressBar progressBar;
     adaptadorDeEmociones adaptadorDeEmociones;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -49,6 +50,7 @@ public class FragResultados extends Fragment {
         txtEdad = v.findViewById(R.id.promEdad);
         btnVolver = v.findViewById(R.id.btnvolver);
         progressBar = v.findViewById(R.id.progress);
+        txtResultados = v.findViewById(R.id.Resultados);
         progressBar.setMax(100);
 
         adaptadorDeEmociones = new adaptadorDeEmociones(getActivity(), MainActivity.arrEmociones);
@@ -86,6 +88,7 @@ public class FragResultados extends Fragment {
             }
         }
         else {
+            txtResultados.setVisibility(View.VISIBLE);
             if(arrBool.get(0))
             {
                 chart3.setVisibility(View.VISIBLE);
@@ -114,7 +117,7 @@ public class FragResultados extends Fragment {
         }
 
 
-        if(!arrBool.get(0) && !arrBool.get(1) && !arrBool.get(2) && !arrBool.get(3) && !arrBool.get(4))
+        if(!arrBool.get(0) && !arrBool.get(1) && !arrBool.get(2) && !arrBool.get(3) && !arrBool.get(4)  && !arrBool.get(5))
         {
             imgWarning.setVisibility(View.VISIBLE);
         }
@@ -201,7 +204,7 @@ public class FragResultados extends Fragment {
     }
 
     private void generateGeneral(){
-
+        txtResultados.setText("La cantidad de fotos procesadas es : "+MainActivity.cantFotos);
         List pieData0 = new ArrayList<>();
         int calvosF = MainActivity.arrCantAcum.get(0);
         int noCalvosF = MainActivity.arrCantAcum.get(1);
