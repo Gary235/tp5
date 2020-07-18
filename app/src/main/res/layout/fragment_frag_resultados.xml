@@ -7,9 +7,6 @@
     android:background="@drawable/fondo_resultados">
 
 
-
-
-
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

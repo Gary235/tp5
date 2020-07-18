@@ -30,6 +30,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.microsoft.projectoxford.face.FaceServiceClient;
 import com.microsoft.projectoxford.face.FaceServiceRestClient;
@@ -48,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
     FragmentTransaction transaccionFragment;
     Fragment frag;
 
-    CheckBox check1,check2,check3,check4,check5;
+    CheckBox check1,check2,check3,check4,check5,check6;
     ImageView img;
     ImageButton btnFlecha;
     Button foto, gal;
@@ -58,15 +59,18 @@ public class MainActivity extends AppCompatActivity {
     Bitmap bmp;
     ProgressDialog dialogo;
 
-    public static ArrayList<Integer>  arrCant = new ArrayList<>();
-    public static ArrayList<Float> arrProm = new ArrayList<>();
+    public static ArrayList<Integer>  arrCant = new ArrayList<>(), arrCantAcum = new ArrayList<>();
+    public static ArrayList<Float> arrProm = new ArrayList<>(), arrPromAcum = new ArrayList<>();
     ArrayList<Boolean> arrCheckBox = new ArrayList<>();
     public static ArrayList<Emocion> arrEmociones = new ArrayList<>();
 
-    public static double promEdad;
-    public static int cantH;
-    public static int cantM;
-    public static String mensajeEmociones = "Emociones Encontradas: \n";
+    public static double promEdad, promEdadAcum;
+    public static int cantH, cantHAcum;
+    public static int cantM, cantMAcum;
+
+    Double acumEdadesAcum = 0.0; int cantAcum=0;
+    float cantMujerViejaAcum = 0, cantMujerJovenAcum = 0;
+    int cantCalvosFelicesAcum = 0, cantNoCalvosFelicesAcum  = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
         check3 = findViewById(R.id.check3);
         check4 = findViewById(R.id.check4);
         check5 = findViewById(R.id.check5);
+        check6 = findViewById(R.id.check6);
         img = findViewById(R.id.imagen);
         foto = findViewById(R.id.Foto);
         gal = findViewById(R.id.Galeria);
@@ -227,6 +232,7 @@ public class MainActivity extends AppCompatActivity {
                 arrCheckBox.add(check3.isChecked());
                 arrCheckBox.add(check4.isChecked());
                 arrCheckBox.add(check5.isChecked());
+                arrCheckBox.add(check6.isChecked());
                 arrEmociones.clear();
                 cantH = 0;
                 cantM = 0;
@@ -256,9 +262,13 @@ public class MainActivity extends AppCompatActivity {
                         Log.d("Servicio", "Sale del try");
                     } catch (Exception error) {
                         Log.d("Servicio", "Error: " + error.getMessage());
+                        Toast toast1 = Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_SHORT);
+                        toast1.show();
                     }
                 } else {
                     Log.d("Servicio", "Input Stream es null");
+                    Toast toast1 = Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_SHORT);
+                    toast1.show();
                 }
                 return resultado;
             }
@@ -280,7 +290,6 @@ public class MainActivity extends AppCompatActivity {
 
                         arrCant.clear();
                         arrProm.clear();
-                        mensajeEmociones = "Emociones Encontradas: \n";
                         btnFlecha.setVisibility(View.VISIBLE);
 
                         procesarCalvosFelices(faces);
@@ -288,6 +297,7 @@ public class MainActivity extends AppCompatActivity {
                         procesarEmociones(faces);
                         procesarCantSexo(faces);
                         procesarEdades(faces);
+                        procesarGeneral(faces);
 
                         frag = new FragResultados();
                         transaccionFragment = adminFragment.beginTransaction();
@@ -298,6 +308,8 @@ public class MainActivity extends AppCompatActivity {
 
                     } else {
                         //No se detecta ninguna cara
+                        Toast toast1 = Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_SHORT);
+                        toast1.show();
                     }
                 }
 
@@ -310,9 +322,6 @@ public class MainActivity extends AppCompatActivity {
 
     public  void procesarCalvosFelices(Face[] faces) {
         int cantCalvosFelices = 0, cantNoCalvosFelices = 0;
-
-        //cantCalvosFelices = preferencias.getInt("cantCalvosFelices", 0);
-        //cantNoCalvosFelices = preferencias.getInt("cantNoCalvosFelices", 0);
 
 
         for (int i = 0; i < faces.length; i++) {
@@ -444,7 +453,60 @@ public class MainActivity extends AppCompatActivity {
         }
         promEdad = acumEdades/cant;
     }
-    
+
+    public void procesarGeneral(Face[] faces){
+
+        for (int i = 0; i < faces.length; i++) {
+
+            if (faces[i].faceAttributes.emotion.happiness > 0.5) {
+                if (faces[i].faceAttributes.hair.bald > 0.5) {
+                    cantCalvosFelicesAcum++;
+                } else {
+                    cantNoCalvosFelicesAcum++;
+                }
+            }
+        }
+        Log.d("PRUEBAGENERAL", "CalvosF: " + cantCalvosFelicesAcum + ", NoCalvosF: " + cantNoCalvosFelicesAcum);
+
+        arrCantAcum.add(cantCalvosFelicesAcum );
+        arrCantAcum.add(cantNoCalvosFelicesAcum );
+
+        ///////////////////////////////////////////////////////////////////////////
+
+
+        for (int i = 0; i < faces.length; i++) {
+            if (faces[i].faceAttributes.gender.equals("female")) {
+                if (faces[i].faceAttributes.age > 60) {
+                    if(faces[i].faceAttributes.makeup.lipMakeup || faces[i].faceAttributes.makeup.eyeMakeup) cantMujerViejaAcum++;
+                } else {
+                    if(faces[i].faceAttributes.makeup.lipMakeup || faces[i].faceAttributes.makeup.eyeMakeup) cantMujerJovenAcum++;
+                }
+            }
+        }
+
+        arrPromAcum.add(cantMujerJovenAcum);
+        arrPromAcum.add(cantMujerViejaAcum);
+
+        ///////////////////////////////////////////////////////////////////////////
+
+        for (int i = 0; i < faces.length; i++) {
+            if (faces[i].faceAttributes.gender.equals("female")) {
+                cantMAcum++;
+            } else {
+                cantHAcum++;
+            }
+        }
+
+        ///////////////////////////////////////////////////////////////////////////
+
+        for (int i = 0; i < faces.length; i++) {
+            acumEdadesAcum += faces[i].faceAttributes.age;
+            cantAcum++;
+        }
+        promEdadAcum = acumEdadesAcum/cantAcum;
+
+
+    }
     
     
     //------

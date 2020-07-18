@@ -94,6 +94,19 @@
         android:layout_marginTop="20dp"
         />
 
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/check6"
+
+        android:text="Ver Informacion General"
+        app:layout_constraintLeft_toLeftOf="@id/check5"
+        app:layout_constraintTop_toBottomOf="@id/check5"
+        android:layout_marginTop="50dp"
+        />
+
+
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
