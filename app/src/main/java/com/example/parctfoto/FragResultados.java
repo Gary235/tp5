@@ -204,7 +204,7 @@ public class FragResultados extends Fragment {
     }
 
     private void generateGeneral(){
-        txtResultados.setText("La cantidad de fotos procesadas es : "+MainActivity.cantFotos);
+        txtResultados.setText("La cantidad de fotos procesadas es : "+ MainActivity.cantFotos);
         List pieData0 = new ArrayList<>();
         int calvosF = MainActivity.arrCantAcum.get(0);
         int noCalvosF = MainActivity.arrCantAcum.get(1);

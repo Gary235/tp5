@@ -7,11 +7,13 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -38,6 +40,7 @@ import android.widget.Toast;
 import com.microsoft.projectoxford.face.FaceServiceClient;
 import com.microsoft.projectoxford.face.FaceServiceRestClient;
 import com.microsoft.projectoxford.face.contract.Face;
+import com.microsoft.projectoxford.face.contract.FaceLandmarks;
 import com.microsoft.projectoxford.face.contract.FaceRectangle;
 
 import java.io.ByteArrayInputStream;
@@ -59,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
     ImageView img;
     ImageButton btnFlecha;
     Button foto, gal,borrar;
-    Boolean TodosPermisos = false;
+    Boolean TodosPermisos = false, infoGeneral = true;
     FaceServiceRestClient servicioProcesamientoImagenes;
     SharedPreferences preferencias;
     Bitmap bmp;
@@ -222,12 +225,41 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
         }
-        procesarImagenObtenida(bmp);
+
+        AlertDialog.Builder mensaje;
+        mensaje = new AlertDialog.Builder(this);
+        mensaje.setTitle("Añadir a General");
+        mensaje.setMessage("¿Desea añadir la informacion de la foto a la estadistica general?");
+        mensaje.setPositiveButton("SI",escuchador2);
+        mensaje.setNegativeButton("NO", escuchador2);
+        mensaje.create();
+        mensaje.show();
+
+
     }
+    DialogInterface.OnClickListener escuchador2 = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+
+            if(which == -1)
+            {
+                infoGeneral = true;
+                cantFotos++;
+
+            }
+            else if(which == -2)
+            {
+                //dialog.cancel();
+                infoGeneral = false;
+            }
+            procesarImagenObtenida(bmp);
+
+        }
+    };
 
 
     public void procesarImagenObtenida(final Bitmap imagenAProcesar) {
-        cantFotos++;
+
         ByteArrayOutputStream streamSalida = new ByteArrayOutputStream();
         imagenAProcesar.compress(Bitmap.CompressFormat.JPEG, 100, streamSalida);
         ByteArrayInputStream streamEntrada = new ByteArrayInputStream(streamSalida.toByteArray());
@@ -343,7 +375,7 @@ public class MainActivity extends AppCompatActivity {
     public void encuadrarCaras (Face[] faces, Bitmap imag)
     {
         Bitmap imgAdibujar;
-        imgAdibujar=imag.copy(Bitmap.Config.ARGB_8888,true);
+        imgAdibujar = imag.copy(Bitmap.Config.ARGB_8888,true);
         Canvas lienzo = new Canvas(imgAdibujar);
         Paint pincel = new Paint();
         pincel.setAntiAlias(true);
@@ -352,8 +384,9 @@ public class MainActivity extends AppCompatActivity {
         for (Face unaCara:faces)
         {
             pincel.setColor( ChartUtils.pickColor());
-            FaceRectangle rectanguloCara=unaCara.faceRectangle;
-            lienzo.drawRect(rectanguloCara.left,rectanguloCara.top,rectanguloCara.left+rectanguloCara.width,rectanguloCara.top+rectanguloCara.height,pincel);
+            FaceRectangle rectanguloCara = unaCara.faceRectangle;
+
+            lienzo.drawRect(rectanguloCara.left, rectanguloCara.top ,rectanguloCara.left + rectanguloCara.width,rectanguloCara.top + rectanguloCara.height, pincel);
         }
         img.setImageBitmap(imgAdibujar);
     }
@@ -376,7 +409,7 @@ public class MainActivity extends AppCompatActivity {
         arrCant.add(cantNoCalvosFelices);
     }
 
-    public void procesarMakeUp(Face[] faces) {
+    public void procesarMakeUp(Face[] faces)    {
         float cantMujerVieja = 0, cantMujerJoven = 0;
 
         for (int i = 0; i < faces.length; i++) {
@@ -392,7 +425,8 @@ public class MainActivity extends AppCompatActivity {
         arrProm.add(cantMujerJoven);
         arrProm.add(cantMujerVieja);
     }
-    public void procesarEmociones(Face[] faces){
+
+    public void procesarEmociones(Face[] faces) {
         boolean felicidad = false, tristeza= false, enojo= false, disgusto= false,neutral= false,miedo= false,sorpresa= false;
 
         for (int i = 0; i < faces.length; i++) {
@@ -469,7 +503,7 @@ public class MainActivity extends AppCompatActivity {
             arrEmociones.add(emocion);
     }
 
-    public void procesarCantSexo(Face[] faces) {
+    public void procesarCantSexo(Face[] faces)  {
         for (int i = 0; i < faces.length; i++) {
             if (faces[i].faceAttributes.gender.equals("female")) {
                 cantM++;
@@ -479,7 +513,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void procesarEdades(Face[] faces) {
+    public void procesarEdades(Face[] faces)    {
         Double acumEdades = 0.0; int cant=0;
         for (int i = 0; i < faces.length; i++) {
             acumEdades+=faces[i].faceAttributes.age;
@@ -488,56 +522,62 @@ public class MainActivity extends AppCompatActivity {
         promEdad = acumEdades/cant;
     }
 
-    public void procesarGeneral(Face[] faces){
-        arrCantAcum.clear();
-        for (int i = 0; i < faces.length; i++) {
+    public void procesarGeneral(Face[] faces)   {
 
-            if (faces[i].faceAttributes.emotion.happiness > 0.5) {
-                if (faces[i].faceAttributes.hair.bald > 0.5) {
-                    cantCalvosFelicesAcum++;
-                } else {
-                    cantNoCalvosFelicesAcum++;
+        if(infoGeneral)
+        {
+            arrCantAcum.clear();
+            for (int i = 0; i < faces.length; i++) {
+
+                if (faces[i].faceAttributes.emotion.happiness > 0.5) {
+                    if (faces[i].faceAttributes.hair.bald > 0.5) {
+                        cantCalvosFelicesAcum++;
+                    } else {
+                        cantNoCalvosFelicesAcum++;
+                    }
                 }
             }
-        }
-        Log.d("PRUEBAGENERAL", "CalvosF: " + cantCalvosFelicesAcum + ", NoCalvosF: " + cantNoCalvosFelicesAcum);
+            Log.d("PRUEBAGENERAL", "CalvosF: " + cantCalvosFelicesAcum + ", NoCalvosF: " + cantNoCalvosFelicesAcum);
 
-        arrCantAcum.add(cantCalvosFelicesAcum );
-        arrCantAcum.add(cantNoCalvosFelicesAcum );
+            arrCantAcum.add(cantCalvosFelicesAcum );
+            arrCantAcum.add(cantNoCalvosFelicesAcum );
 
-        ///////////////////////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////////////////////
 
-        arrPromAcum.clear();
-        for (int i = 0; i < faces.length; i++) {
-            if (faces[i].faceAttributes.gender.equals("female")) {
-                if (faces[i].faceAttributes.age > 60) {
-                    if(faces[i].faceAttributes.makeup.lipMakeup || faces[i].faceAttributes.makeup.eyeMakeup) cantMujerViejaAcum++;
-                } else {
-                    if(faces[i].faceAttributes.makeup.lipMakeup || faces[i].faceAttributes.makeup.eyeMakeup) cantMujerJovenAcum++;
+            arrPromAcum.clear();
+            for (int i = 0; i < faces.length; i++) {
+                if (faces[i].faceAttributes.gender.equals("female")) {
+                    if (faces[i].faceAttributes.age > 60) {
+                        if(faces[i].faceAttributes.makeup.lipMakeup || faces[i].faceAttributes.makeup.eyeMakeup) cantMujerViejaAcum++;
+                    } else {
+                        if(faces[i].faceAttributes.makeup.lipMakeup || faces[i].faceAttributes.makeup.eyeMakeup) cantMujerJovenAcum++;
+                    }
                 }
             }
-        }
 
-        arrPromAcum.add(cantMujerJovenAcum);
-        arrPromAcum.add(cantMujerViejaAcum);
+            arrPromAcum.add(cantMujerJovenAcum);
+            arrPromAcum.add(cantMujerViejaAcum);
 
-        ///////////////////////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////////////////////
 
-        for (int i = 0; i < faces.length; i++) {
-            if (faces[i].faceAttributes.gender.equals("female")) {
-                cantMAcum++;
-            } else {
-                cantHAcum++;
+            for (int i = 0; i < faces.length; i++) {
+                if (faces[i].faceAttributes.gender.equals("female")) {
+                    cantMAcum++;
+                } else {
+                    cantHAcum++;
+                }
             }
-        }
 
-        ///////////////////////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////////////////////
 
-        for (int i = 0; i < faces.length; i++) {
-            acumEdadesAcum += faces[i].faceAttributes.age;
-            cantAcum++;
+            for (int i = 0; i < faces.length; i++) {
+                acumEdadesAcum += faces[i].faceAttributes.age;
+                cantAcum++;
+            }
+            promEdadAcum = acumEdadesAcum/cantAcum;
+
         }
-        promEdadAcum = acumEdadesAcum/cantAcum;
+        else { }
     }
         //---------------------------------------------------------------------------
 
