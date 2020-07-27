@@ -183,7 +183,6 @@ public class MainActivity extends AppCompatActivity {
             llamarASacarFoto = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             startActivityForResult(llamarASacarFoto, 2);
         }
-
     }
 
     @Override
@@ -333,13 +332,14 @@ public class MainActivity extends AppCompatActivity {
                         toast1.show();
                     }
                 }
-
             }
         }
 
         procesarImagen miTarea = new procesarImagen();
         miTarea.execute(streamEntrada);
     }
+
+
     public void encuadrarCaras (Face[] faces, Bitmap imag)
     {
         Bitmap imgAdibujar;
@@ -357,9 +357,9 @@ public class MainActivity extends AppCompatActivity {
         }
         img.setImageBitmap(imgAdibujar);
     }
+
     public  void procesarCalvosFelices(Face[] faces) {
         int cantCalvosFelices = 0, cantNoCalvosFelices = 0;
-
 
         for (int i = 0; i < faces.length; i++) {
 
@@ -370,13 +370,12 @@ public class MainActivity extends AppCompatActivity {
                     cantNoCalvosFelices++;
                 }
             }
-
         }
 
         arrCant.add(cantCalvosFelices);
         arrCant.add(cantNoCalvosFelices);
-
     }
+
     public void procesarMakeUp(Face[] faces) {
         float cantMujerVieja = 0, cantMujerJoven = 0;
 
@@ -392,13 +391,11 @@ public class MainActivity extends AppCompatActivity {
 
         arrProm.add(cantMujerJoven);
         arrProm.add(cantMujerVieja);
-
     }
     public void procesarEmociones(Face[] faces){
         boolean felicidad = false, tristeza= false, enojo= false, disgusto= false,neutral= false,miedo= false,sorpresa= false;
 
         for (int i = 0; i < faces.length; i++) {
-
             if(faces[i].faceAttributes.emotion.happiness > 0.5){
                 felicidad = true;
             }
@@ -426,8 +423,9 @@ public class MainActivity extends AppCompatActivity {
             {
                 sorpresa = true;
             }
-
         }
+
+
             Emocion emocion;
 
             emocion = new Emocion();
@@ -469,9 +467,8 @@ public class MainActivity extends AppCompatActivity {
             emocion.setNombre("Sorpresa");
             emocion.setHayoNo(sorpresa);
             arrEmociones.add(emocion);
-
-
     }
+
     public void procesarCantSexo(Face[] faces) {
         for (int i = 0; i < faces.length; i++) {
             if (faces[i].faceAttributes.gender.equals("female")) {
@@ -481,6 +478,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
     public void procesarEdades(Face[] faces) {
         Double acumEdades = 0.0; int cant=0;
         for (int i = 0; i < faces.length; i++) {
@@ -489,6 +487,7 @@ public class MainActivity extends AppCompatActivity {
         }
         promEdad = acumEdades/cant;
     }
+
     public void procesarGeneral(Face[] faces){
         arrCantAcum.clear();
         for (int i = 0; i < faces.length; i++) {
@@ -540,7 +539,8 @@ public class MainActivity extends AppCompatActivity {
         }
         promEdadAcum = acumEdadesAcum/cantAcum;
     }
-    //------
+        //---------------------------------------------------------------------------
+
     public ArrayList<Boolean> devolverCheck()
     {
             return arrCheckBox;
